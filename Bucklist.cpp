@@ -27,13 +27,13 @@ BucketList::~BucketList() {
 	// IMPLEMENT ME
 	for (int i = 0; i < getCap(); i++)
 	{
-		Node* temp = buckets_[i];
+		Node* &temp = buckets_[i];
 		if (temp == nullptr)
 		{
 			delete temp;
 		}
 		while (temp != nullptr) {
-			Node* t = temp;
+			Node* &t = temp;
 			temp = temp->next_;
 			delete t;
 		}
@@ -44,19 +44,23 @@ BucketList::~BucketList() {
 
 BucketList::BucketList(const BucketList& other) {
 	// IMPLEMENT ME
-	this->size = other.size;
-	this->buckets_ = new Node*[this->getCap()];
-	for (int i = 0; i < this->getCap(); i++)
+	size = other.size;
+	buckets_ = new Node*[getCap()];          //create a new buckets with the same size, copy the string into the new one
+	for (int i = 0; i <getCap(); i++)
 	{
 		buckets_[i] = nullptr;
 	}
-	for (int i = 0; i < this->getCap(); i++) {
+	for (int i = 0; i < getCap(); i++) 
+	{
 		Node* temp = other.buckets_[i];
-		if (other.buckets_[i] == nullptr)  continue;
-		temp = temp->next_;
-		while (temp!= nullptr) {
-			this->insert(temp->s_);
+		if (other.buckets_[i] != nullptr)
+		{
 			temp = temp->next_;
+			while (temp!= nullptr) 
+			{
+				insert(temp->s_);
+				temp = temp->next_;
+			}
 		}
 		
 	}
@@ -67,32 +71,36 @@ BucketList& BucketList::operator=(const BucketList& other) {
 	if (&other == this) return *this;
 	else
 	{
-		for (int i = 0; i < this->getCap(); i++)
+		for (int i = 0; i < getCap(); i++)           //delete the old buckets_
 		{
-			Node* temp = this->buckets_[i];
-			while (temp != nullptr) {
+			Node* temp = buckets_[i];
+			while (temp != nullptr) 
+			{
 				Node* t = temp;
 				temp = temp->next_;
 				delete t;
 			}
 		}
-		delete[]buckets_;
+		delete []buckets_;
 		buckets_ = nullptr;
 
 		size = other.size;
-		buckets_ = new Node * [other.getCap()];
+		buckets_ = new Node * [other.getCap()];          //create a new buckets with the same size, copy the string into the new one
 		for (int i = 0; i < other.getCap(); i++)
 		{
-			this->buckets_[i] =nullptr;
+			buckets_[i] =nullptr;
 		}
 		for (int i = 0; i < other.getCap(); i++)
 		{
 			Node* temp = other.buckets_[i];
-			if (other.buckets_[i] == nullptr) continue;
-			temp = temp->next_;
-			while (temp != nullptr) {
-				this->insert(temp->s_);
+			if (other.buckets_[i] != nullptr)
+			{
 				temp = temp->next_;
+				while (temp != nullptr) 
+				{
+					insert(temp->s_);
+					temp = temp->next_;
+				}
 			}
 		}
 	}
@@ -115,12 +123,12 @@ bool BucketList::contains(const string& s) const {
 
 void BucketList::insert(const string& s) {
 	// IMPLEMENT ME
-	if (this->contains(s)) return;
+	if (contains(s)) return;
 
-	float load = float(getSize() + 1) / float(getCap());
+	float load = float(getSize() + 1) / float(getCap());        //current inserts, if load exceed the maximum, call doublesize and double the number of buckets
 	if (load > MAX_LOAD_FACTOR)
 	{
-		this->doublesize();
+		doublesize();
 	}
 
 	int hc = h(s) % getCap();
@@ -146,7 +154,7 @@ void BucketList::insert(const string& s) {
 			newNode->next_ = buckets_[hc];
 			buckets_[hc] = newNode;
 		}
-		else if(buckets_[hc] + num==nullptr)
+		else if(buckets_[hc] + num==nullptr)        //the insertion position is at the end
 		{
 			Node* temp = buckets_[hc];
 			for (int i = 0; i < num-1; i++)
@@ -159,7 +167,7 @@ void BucketList::insert(const string& s) {
 		else
 		{
 			Node* temp = buckets_[hc];
-			for (int i = 0; i < num - 1; i++)
+			for (int i = 0; i < num - 1; i++)   //find the front node and insert
 			{
 				temp = temp->next_;
 			}
@@ -190,7 +198,7 @@ void BucketList::remove(const string& s) {
 				else
 				{
 					Node* tp = buckets_[i];
-					for (int j = 0; j < count-1; j++)
+					for (int j = 0; j < count-1; j++)      //find the front node and delete specified node
 					{
 						tp = tp->next_;
 					}
@@ -211,22 +219,21 @@ string BucketList::toString() const {
 	for (int i = 0; i < getCap(); i++)
 	{
 		stringstream ss;
-		string num;
+		string num;                     //the buckets numbers
 		Node* temp = buckets_[i];
-		ss << i;
+		ss << i;                       
 		ss >> num;
 		str = str + num;
 		while (temp != nullptr) {
-			if (temp == buckets_[i])
+			if(temp==buckets_[i])
 			{
 				str = str + temp->s_;
 			}
 			else
 			{
 				str = str + " " + temp->s_;
-			}
+			}		
 			temp = temp->next_;
-					
 		}
 		if (i < getCap() -1)
 		{
@@ -255,11 +262,13 @@ int BucketList::getSize() const {
 	for (int i = 0; i < getCap(); i++)
 	{
 		Node* temp = buckets_[i];
-		if (temp == nullptr) continue;
-		temp = temp->next_;
-		while (temp != nullptr) {
-			num++;
+		if (temp != nullptr)
+		{
 			temp = temp->next_;
+			while (temp != nullptr) {
+				num++;
+				temp = temp->next_;
+			}
 		}
 	}
 	return num; // dummy
@@ -274,21 +283,19 @@ int BucketList::getCap() const {
 void BucketList::doublesize()  {
 	// IMPLEMENT ME
 	BucketList copy(*this);
-	for (int i = 0; i < this->getCap(); i++) 
+	for (int i = 0; i < getCap(); i++)    //delete old buckets_
 	{
-		Node* temp = this->buckets_[i];
+		Node* temp = buckets_[i];
 		while (temp != nullptr) {
 			Node* t = temp;
 			temp = temp->next_;
 			delete t;
-			t = nullptr;
 		}
 	}
-	delete[] this->buckets_;
-	this->buckets_ = nullptr;
-	this->size = size * 2;
-	int cap = this->getCap();
-
+	delete []buckets_;
+	buckets_ = nullptr;
+	size = copy.size * 2;               //doublesize and create the new buckets_
+	int cap = getCap();
 	buckets_ = new Node * [cap];
 	for (int i = 0; i < cap; i++) 
 	{
@@ -297,15 +304,16 @@ void BucketList::doublesize()  {
 
 	for (int i = 0; i < copy.getCap(); i++)
 	{
-		if (copy.buckets_[i] == nullptr)  continue;
-		Node* temp =copy.buckets_[i];
-		temp = temp->next_;
-		while (temp != nullptr) 
+		if (copy.buckets_[i] != nullptr)
 		{
-			string str = temp->s_;
-			int num = h(str) % cap;
-			this->insert(str);
+			Node* temp =copy.buckets_[i];
 			temp = temp->next_;
+			while (temp != nullptr) 
+			{
+				string str = temp->s_;
+				insert(str);
+				temp = temp->next_;
+			}
 		}
 	}
 }
