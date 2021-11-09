@@ -124,19 +124,31 @@ void BucketList::remove(const string& s) {
 	for (int i = 0; i < INITIAL_CAP; i++)
 	{
 		Node* temp = buckets_[i];
+		int count = 0;
 		while (temp != nullptr) {
+			
 			if (temp->s_ == s) 
 			{
 				if (temp == buckets_[i])
 				{
 					Node* t = temp->next_;
 					buckets_[i] = t;
+					delete temp;
+					return;
 				}
 				else
 				{
-					(temp - 1)->next_ = temp->next_;
+					Node* tp = buckets_[i];
+					for (int j = 0; j < count-1; j++)
+					{
+						tp = tp->next_;
+					}
+					tp->next_ = temp->next_;
+					delete temp;
+					return;
 				}	
 			}
+			count++;
 			temp = temp->next_;
 		}
 	}
@@ -152,12 +164,15 @@ string BucketList::toString() const {
 		Node* temp = buckets_[i];
 		ss << i;
 		ss >> num;
-		str = str + num + " ";
+		str = str + num;
 		while (temp != nullptr) {
-			str = str + temp->s_+" ";
+			str = str + " " + temp->s_;
 			temp = temp->next_;
 		}
-		str = str + "\n";
+		if (i < INITIAL_CAP-1)
+		{
+			str = str + "\n";
+		}
 	}
 	return str; // dummy
 }
