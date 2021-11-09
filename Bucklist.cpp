@@ -217,8 +217,16 @@ string BucketList::toString() const {
 		ss >> num;
 		str = str + num;
 		while (temp != nullptr) {
-			str = str + " " + temp->s_;
+			if (temp == buckets_[i])
+			{
+				str = str + temp->s_;
+			}
+			else
+			{
+				str = str + " " + temp->s_;
+			}
 			temp = temp->next_;
+					
 		}
 		if (i < getCap() -1)
 		{
