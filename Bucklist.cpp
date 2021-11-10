@@ -246,12 +246,10 @@ string BucketList::toString() const {
 int BucketList::h(const string& s) const {
 	// IMPLEMENT ME
 	int len = s.length();
-	char* str = new char[len];
-	strcpy(str, s.c_str());
 	int sum = 0;
 	for (int i = 0; i<len; i++)
 	{
-		sum += (pow(2, i)) * (int(str[i]));
+		sum += (pow(2, i)) * (int(s[i]));
 	}
 	return sum; // dummy
 }
